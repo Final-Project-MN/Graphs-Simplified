@@ -24,17 +24,17 @@ TRI_MATRIX = [
 ]
 
 QUAD_MATRIX = [
-	[0, 1, 1, 1],
-	[1, 0, 1, 1],
-	[1, 1, 0, 1],
-	[1, 1, 1, 0]
+	[0, 1, 3, 6],
+	[1, 0, 2, 1],
+	[3, 2, 0, 1],
+	[6, 1, 1, 0]
 ]
 
 OCT_MATRIX = [
 	[0, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 1, 1, 1, 1, 1, 1],
+	[1, 0, 1, 0, 1, 1, 1, 1],
 	[1, 1, 0, 1, 1, 1, 1, 1],
-	[1, 1, 1, 0, 1, 1, 1, 1],
+	[1, 0, 1, 0, 1, 1, 1, 1],
 	[1, 1, 1, 1, 0, 1, 1, 1],
 	[1, 1, 1, 1, 1, 0, 1, 1],
 	[1, 1, 1, 1, 1, 1, 0, 1],
@@ -42,7 +42,11 @@ OCT_MATRIX = [
 ]
 
 
-CURRENT_MATRIX = OCT_MATRIX
+CURRENT_MATRIX = QUAD_MATRIX
+
+
+def weight_function(weight):
+	return weight*2
 
 
 def generate():
@@ -86,16 +90,25 @@ def generate():
 	# Both num_nodes as it's a symmetric/square matrix
 	for col in range(num_nodes):
 		for row in range(num_nodes):
-			if CURRENT_MATRIX[col][row] == 1:
+			weight = CURRENT_MATRIX[col][row]
+			if weight >= 1:
 				first_center = placed_nodes[col].getCenter()
 				second_center = placed_nodes[row].getCenter()
 
 				p1 = Point(first_center.x, first_center.y)
 				p2 = Point(second_center.x, second_center.y)
+				# mid = Point(first_center.x + (second_center.x - first_center.x)/2, first_center.y + (second_center.y - first_center.y)/2)
+
+				# new_label = Text(mid, weight)
+				# new_label.setFill("red")
+				# new_label.setSize(weight + 20)
+				
+
 
 				new_edge = Line(p1, p2)
-				new_edge.setWidth(1)
+				new_edge.setWidth(weight_function(weight))
 				new_edge.draw(win)
+				# new_label.draw(win)
 
 
 	# Loop through nodes again to label them, so the labels appear on top the lines.
