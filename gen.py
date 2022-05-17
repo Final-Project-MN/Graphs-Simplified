@@ -1,7 +1,9 @@
 # Generate Graph Diagrams from an adjacency matrix
 
+from asyncio.windows_events import NULL
 from ctypes.wintypes import POINT
 import math
+from xml.etree.ElementTree import tostring
 from graphics import *
 
 
@@ -48,9 +50,10 @@ CURRENT_MATRIX = QUAD_MATRIX
 def weight_function(weight):
 	return weight*2
 
+win = GraphWin("Generation Result", DIMENSIONS, DIMENSIONS)
 
-def generate():
-	win = GraphWin("Generation Result", DIMENSIONS, DIMENSIONS)
+def generate(graph):
+	
 
 	center_Point = Point(DIMENSIONS / 2, DIMENSIONS / 2)
 
@@ -59,7 +62,7 @@ def generate():
 	cp.setFill("black")
 	cp.draw(win) 
 
-	num_nodes = len(CURRENT_MATRIX) # number of nodes = len of the matrix as its a square matrix
+	num_nodes = len(graph) # number of nodes = len of the matrix as its a square matrix
 	degree_increment = math.floor(360/num_nodes) # Split 360 degrees into equal increments depending on the # of nodes we have
 	# print(degree_increment)
 	current_degree = 180 # 180 so the top of the graph is where A is (for looks)
@@ -90,7 +93,7 @@ def generate():
 	# Both num_nodes as it's a symmetric/square matrix
 	for col in range(num_nodes):
 		for row in range(num_nodes):
-			weight = CURRENT_MATRIX[col][row]
+			weight = graph[col][row]
 			if weight >= 1:
 				first_center = placed_nodes[col].getCenter()
 				second_center = placed_nodes[row].getCenter()
@@ -120,7 +123,39 @@ def generate():
 		
 
 	# Wait until closing the window until mouse click on the window
-	win.getMouse()
-	win.close()
 
-generate()
+def kruskals(graph):
+	chosen_edges = []
+	start = 1
+	max = -math.inf
+	node_a = 0
+	node_b = 0
+	while len(chosen_edges) < len(graph) - 1:
+		# Loop through one half of the adjacency matrix
+		# to find the highest weight edges
+		for row in range(len(QUAD_MATRIX)):
+			for col in range(start, len(QUAD_MATRIX)):
+				current_weight = QUAD_MATRIX[row][col]
+				if current_weight != 0 and current_weight > max:
+					max = current_weight
+					node_a = row
+					node_b = col
+			start += 1
+
+		# After finding the highest weighted edge in the matrix
+		# We add it to our total weight, and
+		# Add the nodes that contain the edge to 
+		# our chosen_edges matrix for future code to
+		# highlight the edge graphically
+		print("Next edge choice: " + str(max))
+		chosen_edges.append([node_a, node_b])
+
+		print(chosen_edges)
+
+
+
+generate(CURRENT_MATRIX)
+kruskals(CURRENT_MATRIX)
+
+win.getMouse()
+win.close()
