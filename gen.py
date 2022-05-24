@@ -129,13 +129,34 @@ def generate(graph):
 				new_edge.draw(win)
 				# new_label.draw(win)
 
+	# Loop through nodes again to label them, so the labels appear on top the lines.
+	for i in range(len(placed_nodes)):
+		text_point = None
+		center = placed_nodes[i].getCenter()
+		if center.y < DIMENSIONS / 2:
+			text_point = Point(center.x, center.y - NODE_RADIUS - 15)
 		
+		if center.y > DIMENSIONS / 2:
+			text_point = Point(center.x, center.y + NODE_RADIUS + 15)
+		
+		new_label = Text(text_point, INDEX_TO_LETTER[i])
+		new_label.setFill(color_rgb(255, 105, 180))
+		new_label.setSize(25)
+		new_label.draw(win)
+			
 
 def get_node_from_edge(index):
 	return placed_nodes[index]
 
 def draw_from_chosen_edges(graph, chosen_edges, weight):
 	# Now we have our edges chosen, and can highlight them graphically
+	center_Point = Point(110, 20)
+	current_weight = 0
+	weight_text = Text(center_Point, "Total Weight: " + str(current_weight))
+	weight_text.setSize(20)
+	weight_text.draw(win)
+
+
 	for edge in chosen_edges:
 		node_a = edge[0]
 		node_b = edge[1]
@@ -143,6 +164,9 @@ def draw_from_chosen_edges(graph, chosen_edges, weight):
 		drawn_node_a = get_node_from_edge(node_a)
 		drawn_node_b = get_node_from_edge(node_b)
 
+		time.sleep(1)
+		weight_text.setText("Total Weight: " + str(current_weight + graph[edge[0]][edge[1]]))
+		current_weight = current_weight + graph[edge[0]][edge[1]]
 		select_edge = Line(drawn_node_a.getCenter(), drawn_node_b.getCenter())
 		select_edge.setFill("red")
 		select_edge.setWidth(weight_function(graph[node_a][node_b]+2))
@@ -150,11 +174,7 @@ def draw_from_chosen_edges(graph, chosen_edges, weight):
 
 		# Text box for total weight/distance here
 
-	center_Point = Point(DIMENSIONS / 2, 20)
-	weight_text = Text(center_Point, "Total Weight: " + str(weight))
-	weight_text.setSize(20)
-	weight_text.draw(win)
-
+	
 
 def kruskals(graph):
 	chosen_edges = []
@@ -316,13 +336,6 @@ def dijkstra_algorithm(INPUT_MATRIX):
 generate(CURRENT_MATRIX)
 kruskals(CURRENT_MATRIX)
 # dijkstra_algorithm(CURRENT_MATRIX)
-
-# Loop through nodes again to label them, so the labels appear on top the lines.
-for i in range(len(placed_nodes)):
-	new_label = Text(placed_nodes[i].getCenter(), INDEX_TO_LETTER[i])
-	new_label.setFill("white")
-	new_label.setSize(25)
-	new_label.draw(win)
 
 win.getMouse()
 win.close()
